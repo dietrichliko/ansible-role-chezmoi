@@ -1,0 +1,15 @@
+---
+# tasks file for test
+- name: Get info on latest release
+  uri:
+    url: https://api.github.com/repos/twpayne/chezmoi/releases/latest
+    return_content: yes
+  register: chezmoi_latest
+
+- name: Install the package
+  package:
+    name: "{{ chezmoi_latest | to_json | from_json | json_query(query) | first }}"
+    state: present
+  vars:
+    query: "json.assets[?ends_with(name,'-x86_64.rpm')].browser_download_url"
+
